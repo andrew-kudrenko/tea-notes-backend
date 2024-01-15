@@ -16,7 +16,7 @@ namespace TeaNotes.Auth.Controllers.Register
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.NickName == payload.NickName);
 
-            if (user is { })
+            if (user is not null)
             {
                 return Conflict("User with that nickname already exists");
             }

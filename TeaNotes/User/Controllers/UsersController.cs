@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TeaNotes.Database;
 
@@ -12,13 +11,11 @@ namespace TeaNotes.User.Controllers
 
         public UsersController(AppDbContext db) => _db = db;
 
-        [Authorize]
         public async Task<ActionResult> GetAll()
         {
             return Ok(await _db.Users.ToListAsync());
         }
 
-        [Authorize]
         [HttpGet("me")]
         public async Task<ActionResult<Models.User>> GetMe() 
         {

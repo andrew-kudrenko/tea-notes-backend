@@ -70,6 +70,7 @@ namespace TeaNotes.Auth.Controllers.Login
                 Expires = refreshExpiresAt,
                 Domain = "localhost",
             });
+            Response.Cookies.Append("User-Id", user.Id.ToString());
 
             (var accessToken, var accessExpiresAt) = _jwtTokenGenerator.GenerateAccessToken(user);
             await _db.SaveChangesAsync();

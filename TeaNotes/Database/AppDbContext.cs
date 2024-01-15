@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TeaNotes.Auth.Models;
+using TeaNotes.Notes.Models;
 
 namespace TeaNotes.Database
 {
@@ -7,7 +8,8 @@ namespace TeaNotes.Database
     {
         public DbSet<User.Models.User> Users { get; set; }
         public DbSet<RefreshSession> RefreshSessions { get; set; }
-
+        public DbSet<TeaNote> TeaNotes { get; set; }
+        public DbSet<TeaNoteTaste> TeaNoteTastes { get; set; }
         public AppDbContext(DbContextOptions options) : base(options) { }
     }
 }
