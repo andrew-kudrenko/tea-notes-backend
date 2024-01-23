@@ -2,12 +2,12 @@
 
 namespace TeaNotes.Notes.Models
 {
-    public class TeaNoteTaste
+    public class TeaTaste
     {
         public int Id { get; set; }
-        [StringLength(20)]
+
+        [RegularExpression(@"^(sweet|salty|sour|bitter|umami)$")]
         public string Kind { get; set; } = string.Empty;
-        [Required]
         public int TeaNoteId { get; set; }
         public TeaNote TeaNote { get; set; } = null!;
     }

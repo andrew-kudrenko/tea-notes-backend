@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TeaNotes.Auth.Jwt;
-using TeaNotes.Cors;
 using TeaNotes.Database;
 
 var builder = WebApplication.CreateSlimBuilder(args);
@@ -13,7 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(CorsPolicies.Client, policy =>
+    options.AddDefaultPolicy(policy =>
     {
         policy
             .WithExposedHeaders()
@@ -44,7 +43,7 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
-app.UseCors(CorsPolicies.Client);
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

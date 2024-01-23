@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TeaNotes.Database;
 using TeaNotes.Notes.Controllers.Dto;
-using TeaNotes.Notes.Models;
 
 namespace TeaNotes.Notes.Controllers
 {
@@ -16,27 +16,34 @@ namespace TeaNotes.Notes.Controllers
         [HttpGet]
         public ActionResult GetAll()
         {
-            return Ok(_db.TeaNotes.Include(n => n.Tastes).Include(n => n.User).ToList());
+            return Ok(
+                _db.TeaNotes
+                    .Include(n => n.Tastes)
+                    .Include(n => n.User)
+                    .Select(TeaNoteDto.FromTeaNote)
+                    .ToList()
+            );
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateTeaNoteDto source) 
+        public async Task<IActionResult> Create([FromBody] TeaNoteDto source) 
         {
             if (int.TryParse(Request.Cookies["User-Id"], out var userId))
             {
-                var note = await _db.TeaNotes.AddAsync(new()
+                var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user is null)
                 {
-                    Aroma = source.Aroma,
-                    Feeling = source.Feeling,
-                    Taste = source.Taste,
-                    Temperature = source.Temperature,
-                    Title = source.Title,
-                    User = await _db.Users.FirstAsync(u => u.Id == userId),
-                    Tastes = source.Tastes.Select(t => new TeaNoteTaste() { Kind = t }).ToList(),        
-                });
+                    return BadRequest("User is not defined");
+                }
+
+                var note = source.ToTeaNote();
+                note.User = user;
+
+                var created = await _db.TeaNotes.AddAsync(note);
                 await _db.SaveChangesAsync();
 
-                return StatusCode(StatusCodes.Status201Created, note.Entity);
+                return StatusCode(StatusCodes.Status201Created, created.Entity);
             }
 
             return BadRequest();

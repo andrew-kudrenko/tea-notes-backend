@@ -9,7 +9,7 @@ namespace TeaNotes.Database
         public DbSet<User.Models.User> Users { get; set; }
         public DbSet<RefreshSession> RefreshSessions { get; set; }
         public DbSet<TeaNote> TeaNotes { get; set; }
-        public DbSet<TeaNoteTaste> TeaNoteTastes { get; set; }
+        public DbSet<TeaTaste> TeaTastes { get; set; }
         public AppDbContext(DbContextOptions options) : base(options) { }
     }
 }
