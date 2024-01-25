@@ -16,7 +16,7 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithExposedHeaders()
-            .WithOrigins("http://localhost", "http://127.0.0.1:5173")
+            .WithOrigins("http://localhost", "http://localhost:5173")
             .AllowCredentials()
             .AllowAnyHeader()
             .AllowAnyMethod();
@@ -43,6 +43,7 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+app.UseRouting();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();

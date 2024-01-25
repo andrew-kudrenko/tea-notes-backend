@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TeaNotes.Notes.Models
 {
-    [Index(nameof(Title), IsUnique = true)]
     public class TeaNote
     {
         public int Id { get; set; }

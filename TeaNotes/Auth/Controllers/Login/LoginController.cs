@@ -33,6 +33,9 @@ namespace TeaNotes.Auth.Controllers.Login
             {
                 return BadRequest("Password isn't correct");
             }
+            
+            await _db.RefreshSessions.Where(s => s.UserId == user.Id).ExecuteDeleteAsync();
+            await _db.SaveChangesAsync();
 
             return await CreateResponse(user);
         }
@@ -40,7 +43,7 @@ namespace TeaNotes.Auth.Controllers.Login
         [HttpPost("logout")]
         public async Task<ActionResult> Logout()
         {
-            var refreshToken = Request.Cookies[CookieAuthKeys.RefreshToken];
+            var refreshToken = Request.Cookies[CookieKeys.RefreshToken];
 
             if (refreshToken != null)
             {
@@ -48,9 +51,9 @@ namespace TeaNotes.Auth.Controllers.Login
                 await _db.SaveChangesAsync();
             }
 
-            Response.Cookies.Delete(CookieAuthKeys.RefreshToken);
+            Response.Cookies.Delete(CookieKeys.RefreshToken);
 
-            return Ok(refreshToken);
+            return NoContent();
         }
 
         private static bool IsPasswordCorrect(string password, string hash) => BCrypt.Net.BCrypt.Verify(password, hash);
@@ -64,7 +67,7 @@ namespace TeaNotes.Auth.Controllers.Login
                 ExpiresAt = refreshExpiresAt,
             });
 
-            Response.Cookies.Append(CookieAuthKeys.RefreshToken, refreshToken, new() { 
+            Response.Cookies.Append(CookieKeys.RefreshToken, refreshToken, new() { 
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None, 

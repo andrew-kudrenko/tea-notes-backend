@@ -21,7 +21,7 @@ namespace TeaNotes.Auth.Controllers.Refresh
         [HttpPost]
         public async Task<ActionResult<RefreshResponse>> RefreshTokens()
         {
-            var requestRefreshToken = Request.Cookies[CookieAuthKeys.RefreshToken];
+            var requestRefreshToken = Request.Cookies[CookieKeys.RefreshToken];
 
             if (requestRefreshToken is null)
             {
@@ -45,7 +45,7 @@ namespace TeaNotes.Auth.Controllers.Refresh
             }
 
             var (refreshToken, refreshExpiresAt) = _jwtTokenGenerator.GenerateRefreshToken();
-            Response.Cookies.Append(CookieAuthKeys.RefreshToken, refreshToken, new()
+            Response.Cookies.Append(CookieKeys.RefreshToken, refreshToken, new()
             {
                 HttpOnly = true,
                 Secure = true,

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Drawing;
 using TeaNotes.Notes.Models;
 
 namespace TeaNotes.Notes.Controllers.Dto
@@ -52,6 +53,43 @@ namespace TeaNotes.Notes.Controllers.Dto
                 ImpressionRate = Impression.Rate,
                 ImpressionWellCombinedWith = Impression.WellCombinedWith,
             };
+        }
+
+        public void AssignToTeaNote(TeaNote dest)
+        {
+            dest.Title = General.Title;
+            dest.Kind = General.Kind;
+            dest.Region = General.Region;
+            dest.Manufacturer = General.Manufacturer;
+            dest.ManufacturingYear = General.ManufacturingYear;
+            dest.PricePerGram = General.PricePerGram;
+
+            dest.BrewingDishware = Brewing.Dishware;
+            dest.BrewingMethod = Brewing.Method;
+            dest.BrewingQuantity = Brewing.Quantity;
+            dest.BrewingTemperature = Brewing.Temperature;
+            dest.BrewingVolume = Brewing.Volume;
+
+            dest.DryLeafAppearance = DryLeaf.Appearance;
+            dest.DryLeafAroma = DryLeaf.Aroma;
+
+            dest.InfusionAppearance = Infusion.Appearance;
+            dest.InfusionAroma = Infusion.Aroma;
+            dest.InfusionBalance = Infusion.Balance;
+            dest.InfusionBouquet = Infusion.Bouquet;
+            dest.InfusionDensity = Infusion.Density;
+            dest.InfusionExtractivity = Infusion.Extractivity;
+            dest.InfusionTartness = Infusion.Tartness;
+            dest.InfusionTaste = Infusion.Taste;
+            dest.InfusionViscosity = Infusion.Viscosity;
+
+            dest.AftertasteComment = Aftertaste.Comment;
+            dest.AftertasteDuration = Aftertaste.Duration;
+            dest.AftertasteIntensity = Aftertaste.Intensity;
+
+            dest.ImpressionComment = Impression.Comment;
+            dest.ImpressionRate = Impression.Rate;
+            dest.ImpressionWellCombinedWith = Impression.WellCombinedWith;
         }
 
         public static TeaNoteDto FromTeaNote(TeaNote note)
