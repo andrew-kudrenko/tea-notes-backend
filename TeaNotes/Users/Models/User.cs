@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace TeaNotes.User.Models
+namespace TeaNotes.Users.Models
 {
     [Index(nameof(NickName), IsUnique = true)]
     public class User

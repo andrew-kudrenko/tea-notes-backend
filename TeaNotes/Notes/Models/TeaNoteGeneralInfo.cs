@@ -7,6 +7,6 @@
         public required string Region { get; set; }
         public required string Manufacturer { get; set; }
         public required int? ManufacturingYear { get; set; }
-        public required double? PricePerGram { get; set; }
+        public required int? PricePerGram { get; set; }
     }
 }

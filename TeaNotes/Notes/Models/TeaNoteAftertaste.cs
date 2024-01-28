@@ -3,7 +3,7 @@
     public record TeaNoteAftertaste
     {
         public required string Comment { get; set; }
-        public required double? Duration { get; set; }
-        public required double? Intensity { get; set; }
+        public required int? Duration { get; set; }
+        public required int? Intensity { get; set; }
     }
 }

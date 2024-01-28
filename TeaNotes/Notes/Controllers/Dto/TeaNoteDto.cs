@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Drawing;
 using TeaNotes.Notes.Models;
 
 namespace TeaNotes.Notes.Controllers.Dto

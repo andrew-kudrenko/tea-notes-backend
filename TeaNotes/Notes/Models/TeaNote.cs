@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using TeaNotes.Users.Models;
 
 namespace TeaNotes.Notes.Models
 {
@@ -23,13 +23,13 @@ namespace TeaNotes.Notes.Models
         [Range(1900, 2024)]
         public int? ManufacturingYear { get; set; }
 
-        [Range(0, double.MaxValue)]
-        public double? PricePerGram { get; set; }
+        [Range(0, 10_000)]
+        public int? PricePerGram { get; set; }
 
         [RegularExpression(@"^(spill|infuse|boil|other)$")]
         public string? BrewingMethod { get; set; }
 
-        [RegularExpression(@"^(teapot|gaiwan|cup|other)$")]
+        [RegularExpression(@"^(teapot|gaiwan|cup|thermos|other)$")]
         public string? BrewingDishware { get; set; }
         
         [Range(0, 10_000)]
@@ -57,31 +57,31 @@ namespace TeaNotes.Notes.Models
         public string InfusionTaste { get; set; } = string.Empty;
 
         [Range(1, 5)]
-        public double? InfusionBalance { get; set; }
+        public int? InfusionBalance { get; set; }
 
         [Range(1, 5)]
-        public double? InfusionBouquet { get; set; }
+        public int? InfusionBouquet { get; set; }
 
         [Range(1, 5)]
-        public double? InfusionExtractivity { get; set; }
+        public int? InfusionExtractivity { get; set; }
 
         [Range(1, 5)]
-        public double? InfusionTartness { get; set; }
+        public int? InfusionTartness { get; set; }
 
         [Range(1, 5)]
-        public double? InfusionViscosity { get; set; }
+        public int? InfusionViscosity { get; set; }
 
         [Range(1, 5)]
-        public double? InfusionDensity { get; set; }
+        public int? InfusionDensity { get; set; }
 
         [StringLength(2_000)]
         public string AftertasteComment { get; set; } = string.Empty;
 
         [Range(1, 5)]
-        public double? AftertasteDuration { get; set; }
+        public int? AftertasteDuration { get; set; }
 
         [Range(1, 5)]
-        public double? AftertasteIntensity { get; set; }
+        public int? AftertasteIntensity { get; set; }
 
         [StringLength(2_000)]
         public string ImpressionComment { get; set; } = string.Empty;
@@ -90,10 +90,10 @@ namespace TeaNotes.Notes.Models
         public string ImpressionWellCombinedWith { get; set; } = string.Empty;
 
         [Range(1, 5)]
-        public double? ImpressionRate{ get; set; }
+        public int? ImpressionRate{ get; set; }
 
         public ICollection<TeaTaste> Tastes { get; set; } = null!;
      
-        public User.Models.User User { get; set; } = null!;
+        public User User { get; set; } = null!;
     }
 }

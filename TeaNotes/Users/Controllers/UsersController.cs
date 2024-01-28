@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TeaNotes.Database;
 
-namespace TeaNotes.User.Controllers
+namespace TeaNotes.Users.Controllers
 {
+    [Authorize]
     [Route("api/users")]
     public class UsersController : ControllerBase
     {

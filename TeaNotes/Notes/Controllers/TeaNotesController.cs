@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TeaNotes.Auth.Utility;
 using TeaNotes.Database;
 using TeaNotes.Notes.Controllers.Dto;
+using TeaNotes.Users.Models;
 
 namespace TeaNotes.Notes.Controllers
 {
+    [Authorize]
     [Route("api/notes")]
     public class TeaNotesController : ControllerBase
     {
@@ -33,6 +36,7 @@ namespace TeaNotes.Notes.Controllers
             );
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
         {
@@ -107,7 +111,7 @@ namespace TeaNotes.Notes.Controllers
             return StatusCode(StatusCodes.Status201Created, foundNote);
         }
 
-        private async Task<User.Models.User?> GetUser()
+        private async Task<User?> GetUser()
         {
             return int.TryParse(Request.Cookies[CookieKeys.UserId], out var userId)
                 ? await _db.Users.FirstOrDefaultAsync(u => u.Id == userId)

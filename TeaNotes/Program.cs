@@ -1,4 +1,5 @@
 using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,13 +17,13 @@ builder.Services.AddCors(options =>
     {
         policy
             .WithExposedHeaders()
-            .WithOrigins("http://localhost", "http://localhost:5173")
+            .WithOrigins("http://localhost", "http://localhost:5173", "http://localhost:4173")
             .AllowCredentials()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
-builder.Services    
+builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -37,6 +38,7 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration[JwtConfigurationKeys.Secret]!)),
         };
     });
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);

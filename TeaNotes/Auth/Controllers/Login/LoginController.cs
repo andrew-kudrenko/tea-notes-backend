@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TeaNotes.Auth.Jwt;
 using TeaNotes.Auth.Utility;
 using TeaNotes.Database;
+using TeaNotes.Users.Models;
 
 namespace TeaNotes.Auth.Controllers.Login
 {
@@ -33,9 +33,11 @@ namespace TeaNotes.Auth.Controllers.Login
             {
                 return BadRequest("Password isn't correct");
             }
-            
+
             await _db.RefreshSessions.Where(s => s.UserId == user.Id).ExecuteDeleteAsync();
             await _db.SaveChangesAsync();
+
+            
 
             return await CreateResponse(user);
         }
@@ -43,22 +45,23 @@ namespace TeaNotes.Auth.Controllers.Login
         [HttpPost("logout")]
         public async Task<ActionResult> Logout()
         {
-            var refreshToken = Request.Cookies[CookieKeys.RefreshToken];
-
-            if (refreshToken != null)
+            if (Request.Cookies.ContainsKey(CookieKeys.UserId))
             {
-                await _db.RefreshSessions.Where(s => s.RefreshToken == refreshToken).ExecuteDeleteAsync();
+                var userId = int.Parse(Request.Cookies[CookieKeys.UserId]!);
+
+                await _db.RefreshSessions.Where(s => s.UserId == userId).ExecuteDeleteAsync();
                 await _db.SaveChangesAsync();
             }
 
             Response.Cookies.Delete(CookieKeys.RefreshToken);
+            Response.Cookies.Delete(CookieKeys.UserId);
 
             return NoContent();
         }
 
         private static bool IsPasswordCorrect(string password, string hash) => BCrypt.Net.BCrypt.Verify(password, hash);
 
-        private async Task<ActionResult<LoginResponse>> CreateResponse(User.Models.User user)
+        private async Task<ActionResult<LoginResponse>> CreateResponse(User user)
         {
             var (refreshToken, refreshExpiresAt) = _jwtTokenGenerator.GenerateRefreshToken();
             await _db.RefreshSessions.AddAsync(new() { 

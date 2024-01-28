@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TeaNotes.Database;
+using TeaNotes.Users.Models;
 
 namespace TeaNotes.Auth.Controllers.Register
 {
@@ -12,7 +13,7 @@ namespace TeaNotes.Auth.Controllers.Register
         public RegisterController(AppDbContext db) => _db = db;
 
         [HttpPost]
-        public async Task<ActionResult<User.Models.User>> Register([FromBody] RegisterPayload payload)
+        public async Task<ActionResult<User>> Register([FromBody] RegisterPayload payload)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.NickName == payload.NickName);
 

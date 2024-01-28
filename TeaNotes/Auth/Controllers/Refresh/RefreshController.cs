@@ -25,7 +25,7 @@ namespace TeaNotes.Auth.Controllers.Refresh
 
             if (requestRefreshToken is null)
             {
-                return BadRequest("Refresh token wasn't provided");
+                return Unauthorized("Refresh token wasn't provided");
             }
 
             var session = await _db.RefreshSessions.FirstOrDefaultAsync(s => s.RefreshToken == requestRefreshToken);
@@ -36,12 +36,12 @@ namespace TeaNotes.Auth.Controllers.Refresh
             } 
             else 
             {
-                return BadRequest("Session not found");
+                return Unauthorized("Session not found");
             }
 
             if (session.ExpiresAt <= DateTime.Now)
             {
-                return BadRequest("Refresh token is expired");
+                return Unauthorized("Refresh token is expired");
             }
 
             var (refreshToken, refreshExpiresAt) = _jwtTokenGenerator.GenerateRefreshToken();
@@ -58,7 +58,7 @@ namespace TeaNotes.Auth.Controllers.Refresh
 
             if (user is null)
             {
-                return BadRequest("User is not found");
+                return Unauthorized("User is not found");
             }
 
             await _db.RefreshSessions.AddAsync(new()
