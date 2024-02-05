@@ -44,13 +44,13 @@ namespace TeaNotes.Auth.Controllers.Refresh
                 return Unauthorized("Refresh token is expired");
             }
 
-            var (refreshToken, refreshExpiresAt) = _jwtTokenGenerator.GenerateRefreshToken();
-            Response.Cookies.Append(CookieKeys.RefreshToken, refreshToken, new()
+            var refresh = _jwtTokenGenerator.GenerateRefreshToken();
+            Response.Cookies.Append(CookieKeys.RefreshToken, refresh.Token, new()
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,
-                Expires = refreshExpiresAt,
+                Expires = refresh.ExpiresAt,
                 Domain = "localhost",
             });
 
@@ -64,21 +64,17 @@ namespace TeaNotes.Auth.Controllers.Refresh
             await _db.RefreshSessions.AddAsync(new()
             {
                 UserId = user.Id,
-                RefreshToken = refreshToken,
-                ExpiresAt = refreshExpiresAt,
+                RefreshToken = refresh.Token,
+                ExpiresAt = refresh.ExpiresAt,
             });
 
-            var (accessToken, accessExpiresAt) = _jwtTokenGenerator.GenerateAccessToken(user);
+            var access = _jwtTokenGenerator.GenerateAccessToken(user);
 
             await _db.SaveChangesAsync();
 
             return Ok(new RefreshResponse()
             {
-                Tokens = new()
-                {
-                    Access = new () { Token = accessToken, ExpiresAt = accessExpiresAt },
-                    Refresh = new () { Token = refreshToken, ExpiresAt = refreshExpiresAt},
-                }
+                Tokens = new() { Access = access, Refresh = refresh }
             });
         }
     }

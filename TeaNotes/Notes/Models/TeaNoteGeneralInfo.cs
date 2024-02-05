@@ -8,5 +8,6 @@
         public required string Manufacturer { get; set; }
         public required int? ManufacturingYear { get; set; }
         public required int? PricePerGram { get; set; }
+        public required DateOnly TastingDate { get; set; }
     }
 }

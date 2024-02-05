@@ -37,8 +37,6 @@ namespace TeaNotes.Auth.Controllers.Login
             await _db.RefreshSessions.Where(s => s.UserId == user.Id).ExecuteDeleteAsync();
             await _db.SaveChangesAsync();
 
-            
-
             return await CreateResponse(user);
         }
 
@@ -63,33 +61,30 @@ namespace TeaNotes.Auth.Controllers.Login
 
         private async Task<ActionResult<LoginResponse>> CreateResponse(User user)
         {
-            var (refreshToken, refreshExpiresAt) = _jwtTokenGenerator.GenerateRefreshToken();
+            var refresh = _jwtTokenGenerator.GenerateRefreshToken();
+            
             await _db.RefreshSessions.AddAsync(new() { 
                 UserId = user.Id, 
-                RefreshToken = refreshToken, 
-                ExpiresAt = refreshExpiresAt,
+                RefreshToken = refresh.Token, 
+                ExpiresAt = refresh.ExpiresAt,
             });
+            await _db.SaveChangesAsync();
 
-            Response.Cookies.Append(CookieKeys.RefreshToken, refreshToken, new() { 
+            Response.Cookies.Append(CookieKeys.RefreshToken, refresh.Token, new() { 
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None, 
-                Expires = refreshExpiresAt,
+                Expires = refresh.ExpiresAt,
                 Domain = "localhost",
             });
-            Response.Cookies.Append("User-Id", user.Id.ToString());
-
-            (var accessToken, var accessExpiresAt) = _jwtTokenGenerator.GenerateAccessToken(user);
-            await _db.SaveChangesAsync();
+            Response.Cookies.Append(CookieKeys.UserId, user.Id.ToString());
 
             return Ok(new LoginResponse()
             {
-                
                 User = user,
-                Tokens = new()
-                {
-                    Access = new() { Token = accessToken, ExpiresAt = accessExpiresAt},
-                    Refresh = new () { Token = refreshToken, ExpiresAt = refreshExpiresAt },
+                Tokens = new() { 
+                    Access = _jwtTokenGenerator.GenerateAccessToken(user), 
+                    Refresh = refresh,
                 }
             });
         }

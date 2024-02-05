@@ -1,11 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using TeaNotes.Users.Models;
 
 namespace TeaNotes.Notes.Models
 {
     public class TeaNote
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
+
+        [DataType(DataType.Date)]
+        [Column(TypeName = "Date")]
+        public DateOnly TastingDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         [Required]
         [StringLength(100, MinimumLength = 2)]

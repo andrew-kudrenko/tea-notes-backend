@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using TeaNotes.Users.Models;
+using TeaNotes.Auth.Models;
 
 namespace TeaNotes.Auth.Jwt
 {
@@ -31,11 +32,14 @@ namespace TeaNotes.Auth.Jwt
             );
         }
 
-        public (string, DateTime) GenerateRefreshToken() => (Guid.NewGuid().ToString(), DateTime.Now.AddMinutes(1));
-
-        public (string, DateTime) GenerateAccessToken(User user)
+        public AuthToken GenerateRefreshToken()
         {
-            var expires = DateTime.Now.AddSeconds(15);
+            return new() { ExpiresAt = DateTime.Now.AddDays(_refreshLifetime), Token = Guid.NewGuid().ToString() };
+        }
+
+        public AuthToken GenerateAccessToken(User user)
+        {
+            var expires = DateTime.Now.AddMinutes(_tokenLifetime);
             var token = new JwtSecurityToken(
                 issuer: _issuer,
                 audience: _audience,
@@ -44,7 +48,7 @@ namespace TeaNotes.Auth.Jwt
                 signingCredentials: _signingCredentials
             );
 
-            return (_tokenHandler.WriteToken(token), expires);
+            return new() { ExpiresAt = expires, Token = _tokenHandler.WriteToken(token) };
         }
     }
 }

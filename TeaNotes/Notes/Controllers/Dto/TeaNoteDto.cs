@@ -14,83 +14,6 @@ namespace TeaNotes.Notes.Controllers.Dto
         public required TeaNoteAftertaste Aftertaste { get; set; }
         public required TeaNoteImpression Impression { get; set; }
 
-        public TeaNote ToTeaNote()
-        {
-            return new()
-            {
-                Title = General.Title,
-                Kind = General.Kind,
-                Region = General.Region,
-                Manufacturer = General.Manufacturer,
-                ManufacturingYear = General.ManufacturingYear,
-                PricePerGram = General.PricePerGram,
-
-                BrewingDishware = Brewing.Dishware,
-                BrewingMethod = Brewing.Method,
-                BrewingQuantity = Brewing.Quantity,
-                BrewingTemperature = Brewing.Temperature,
-                BrewingVolume = Brewing.Volume,
-
-                DryLeafAppearance = DryLeaf.Appearance,
-                DryLeafAroma = DryLeaf.Aroma,
-
-                InfusionAppearance = Infusion.Appearance,
-                InfusionAroma = Infusion.Aroma,
-                InfusionBalance = Infusion.Balance,
-                InfusionBouquet = Infusion.Bouquet,
-                InfusionDensity = Infusion.Density,
-                InfusionExtractivity = Infusion.Extractivity,
-                InfusionTartness = Infusion.Tartness,
-                InfusionTaste = Infusion.Taste,
-                InfusionViscosity = Infusion.Viscosity,
-
-                AftertasteComment = Aftertaste.Comment,
-                AftertasteDuration = Aftertaste.Duration,
-                AftertasteIntensity = Aftertaste.Intensity,
-
-                ImpressionComment = Impression.Comment,
-                ImpressionRate = Impression.Rate,
-                ImpressionWellCombinedWith = Impression.WellCombinedWith,
-            };
-        }
-
-        public void AssignToTeaNote(TeaNote dest)
-        {
-            dest.Title = General.Title;
-            dest.Kind = General.Kind;
-            dest.Region = General.Region;
-            dest.Manufacturer = General.Manufacturer;
-            dest.ManufacturingYear = General.ManufacturingYear;
-            dest.PricePerGram = General.PricePerGram;
-
-            dest.BrewingDishware = Brewing.Dishware;
-            dest.BrewingMethod = Brewing.Method;
-            dest.BrewingQuantity = Brewing.Quantity;
-            dest.BrewingTemperature = Brewing.Temperature;
-            dest.BrewingVolume = Brewing.Volume;
-
-            dest.DryLeafAppearance = DryLeaf.Appearance;
-            dest.DryLeafAroma = DryLeaf.Aroma;
-
-            dest.InfusionAppearance = Infusion.Appearance;
-            dest.InfusionAroma = Infusion.Aroma;
-            dest.InfusionBalance = Infusion.Balance;
-            dest.InfusionBouquet = Infusion.Bouquet;
-            dest.InfusionDensity = Infusion.Density;
-            dest.InfusionExtractivity = Infusion.Extractivity;
-            dest.InfusionTartness = Infusion.Tartness;
-            dest.InfusionTaste = Infusion.Taste;
-            dest.InfusionViscosity = Infusion.Viscosity;
-
-            dest.AftertasteComment = Aftertaste.Comment;
-            dest.AftertasteDuration = Aftertaste.Duration;
-            dest.AftertasteIntensity = Aftertaste.Intensity;
-
-            dest.ImpressionComment = Impression.Comment;
-            dest.ImpressionRate = Impression.Rate;
-            dest.ImpressionWellCombinedWith = Impression.WellCombinedWith;
-        }
-
         public static TeaNoteDto FromTeaNote(TeaNote note)
         {
             return new() 
@@ -98,6 +21,7 @@ namespace TeaNotes.Notes.Controllers.Dto
                 Id = note.Id,
                 General = new()
                 {
+                    TastingDate = note.TastingDate,
                     Title = note.Title,
                     Kind = note.Kind,
                     Manufacturer = note.Manufacturer,
