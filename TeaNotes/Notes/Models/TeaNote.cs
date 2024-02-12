@@ -11,34 +11,34 @@ namespace TeaNotes.Notes.Models
 
         [DataType(DataType.Date)]
         [Column(TypeName = "Date")]
-        public DateOnly TastingDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public DateOnly? TastingDate { get; set; }
 
         [Required]
-        [StringLength(100, MinimumLength = 2)]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "Длина должна быть от 2 до 100 символов")]
         public string Title { get; set; } = string.Empty;
         
-        [RegularExpression(@"^(green|white|yellow|oolong|red|black|shen-puer|shu-puer)$")]
+        [RegularExpression(@"^(green|white|yellow|oolong|red|black|shen-puer|shu-puer)$", ErrorMessage = "Неизвестный вид")]
         public string? Kind { get; set; }
 
-        [StringLength(100)]
+        [StringLength(100, ErrorMessage = "Длина должна быть не более 100 символов")]
         public string Region { get; set; } = string.Empty;
 
-        [StringLength(100)]
+        [StringLength(100, ErrorMessage = "Длина должна быть не более 100 символов")]
         public string Manufacturer { get; set; } = string.Empty;
 
-        [Range(1900, 2024)]
+        [Range(1970, 2024, ErrorMessage = "Некорректное значение года выпуска")]
         public int? ManufacturingYear { get; set; }
 
-        [Range(0, 10_000)]
+        [Range(0, 1_000, ErrorMessage = "Некорректное значение стоимости")]
         public int? PricePerGram { get; set; }
 
-        [RegularExpression(@"^(spill|infuse|boil|other)$")]
+        [RegularExpression(@"^(spill|infuse|boil|other)$", ErrorMessage = "Неизвестный вид приготовления")]
         public string? BrewingMethod { get; set; }
 
-        [RegularExpression(@"^(teapot|gaiwan|cup|thermos|other)$")]
+        [RegularExpression(@"^(teapot|gaiwan|cup|thermos|other)$", ErrorMessage = "Неизвестный вид посуды")]
         public string? BrewingDishware { get; set; }
         
-        [Range(0, 10_000)]
+        [Range(1, 10_000, ErrorMessage = "Некорректное значение заварочного объёма")]
         public int? BrewingVolume { get; set; }
 
         [Range(0, 100)]
@@ -47,10 +47,10 @@ namespace TeaNotes.Notes.Models
         [Range(1, 100)]
         public int? BrewingQuantity { get; set; }
 
-        [StringLength(2_000)]
+        [StringLength(2_000, ErrorMessage = "Длина должна быть не более 2000 символов")]
         public string DryLeafAppearance { get; set; } = string.Empty;
 
-        [StringLength(2_000)]
+        [StringLength(2_000, ErrorMessage = "Длина должна быть не более 2000 символов")]
         public string DryLeafAroma { get; set; } = string.Empty;
 
         [StringLength(2_000)]

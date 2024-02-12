@@ -142,7 +142,6 @@ namespace TeaNotes.Notes.Controllers
             }
 
             await _db.TeaTastes.AddRangeAsync(source.Infusion.Tastes.Select(t => new TeaTaste() { Kind = t, TeaNote = dest }).ToArray());
-            await _db.SaveChangesAsync();
 
             dest.Title = source.General.Title;
             dest.Kind = source.General.Kind;
@@ -150,7 +149,7 @@ namespace TeaNotes.Notes.Controllers
             dest.Manufacturer = source.General.Manufacturer;
             dest.ManufacturingYear = source.General.ManufacturingYear;
             dest.PricePerGram = source.General.PricePerGram;
-            dest.TastingDate = source.General.TastingDate;
+            dest.TastingDate = source.General.TastingDate is null ? null : DateOnly.ParseExact(source.General.TastingDate, "yyyy-MM-dd");
 
             dest.BrewingDishware = source.Brewing.Dishware;
             dest.BrewingMethod = source.Brewing.Method;
@@ -178,6 +177,8 @@ namespace TeaNotes.Notes.Controllers
             dest.ImpressionComment = source.Impression.Comment;
             dest.ImpressionRate = source.Impression.Rate;
             dest.ImpressionWellCombinedWith = source.Impression.WellCombinedWith;
+
+            await _db.SaveChangesAsync();
         }
     }
 }

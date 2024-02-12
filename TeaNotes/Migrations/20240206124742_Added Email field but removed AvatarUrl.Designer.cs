@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeaNotes.Database;
 
@@ -10,9 +11,11 @@ using TeaNotes.Database;
 namespace TeaNotes.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240206124742_Added Email field but removed AvatarUrl")]
+    partial class AddedEmailfieldbutremovedAvatarUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.9");
@@ -145,7 +148,7 @@ namespace TeaNotes.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateOnly?>("TastingDate")
+                    b.Property<DateOnly>("TastingDate")
                         .HasColumnType("Date");
 
                     b.Property<string>("Title")

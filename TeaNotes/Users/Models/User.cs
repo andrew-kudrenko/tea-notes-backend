@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System.ComponentModel.DataAnnotations;
 
 namespace TeaNotes.Users.Models
 {
@@ -10,7 +10,11 @@ namespace TeaNotes.Users.Models
         public int Id { get; set; }
         [StringLength(30)]
         public string NickName { get; set; } = string.Empty;
-        public string AvatarUrl { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+
+        [JsonIgnore]
+        public bool IsEmailVerified { get; set; }
+
         [JsonIgnore]
         public string PasswordHash { get; set; } = string.Empty;
     }

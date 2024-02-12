@@ -1,14 +1,17 @@
 using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TeaNotes.Auth.Jwt;
 using TeaNotes.Database;
+using TeaNotes.Email;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services.AddSingleton(new JwtTokenGenerator(builder.Configuration));
+builder.Services.AddSingleton(await EmailClient.Create(builder.Configuration));
+
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Main")));
 
 builder.Services.AddCors(options =>
@@ -40,7 +43,8 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers()
+builder.Services
+    .AddControllers(options => options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider()))
     .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
 var app = builder.Build();
