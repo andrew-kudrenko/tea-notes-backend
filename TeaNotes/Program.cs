@@ -11,6 +11,8 @@ var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services.AddSingleton(new JwtTokenGenerator(builder.Configuration));
 builder.Services.AddSingleton(await EmailClient.Create(builder.Configuration));
+builder.Services.AddSingleton(new RegisterEmailBuilder(builder.Configuration));
+builder.Services.AddSingleton(new ConfirmationCodeGenerator());
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Main")));
 

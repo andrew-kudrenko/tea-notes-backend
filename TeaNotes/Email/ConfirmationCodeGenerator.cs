@@ -1,13 +1,18 @@
-﻿namespace TeaNotes.Email
+﻿using TeaNotes.Users.Models;
+
+namespace TeaNotes.Email
 {
     public class ConfirmationCodeGenerator
     {
-        private readonly Random _random = new();
-        private readonly int _length = 6;
+        private readonly int _lifetimeInMinutes = 15;
 
-        public string Generate()
+        public ConfirmationCode Generate(User user) => new()
         {
-            return string.Concat(Enumerable.Range(0, _length).Select(_ => _random.Next(10)));
-        }
+            Email = user.Email,
+            ExpiresAt =  DateTime.Now.AddMinutes(_lifetimeInMinutes),
+            Code = Guid.NewGuid().ToString(),
+            UserId = user.Id,
+            User = user,
+        };
     }
 }

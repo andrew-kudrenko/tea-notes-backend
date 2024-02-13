@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MimeKit;
 using TeaNotes.Database;
 using TeaNotes.Email;
 using TeaNotes.Users.Models;
@@ -12,18 +11,25 @@ namespace TeaNotes.Auth.Controllers.Register
     {
         private readonly AppDbContext _db;
         private readonly EmailClient _emailClient;
+        private readonly RegisterEmailBuilder _registerEmailBuilder;
+        private readonly ConfirmationCodeGenerator _confirmationCodeGenerator;
 
-        public RegisterController(AppDbContext db, EmailClient emailClient)
+        public RegisterController(
+            AppDbContext db, 
+            EmailClient emailClient, 
+            RegisterEmailBuilder registerEmailBuilder,
+            ConfirmationCodeGenerator confirmationCodeGenerator
+        )
         {
             _db = db;
             _emailClient = emailClient;
+            _registerEmailBuilder = registerEmailBuilder;
+            _confirmationCodeGenerator = confirmationCodeGenerator;
         }
 
         [HttpPost]
         public async Task<ActionResult<User>> Register([FromBody] RegisterPayload payload)
         {
-            await _emailClient.SendAsync(CreateConfirmationMessage(payload));
-
             var user = await _db.Users.FirstOrDefaultAsync(u => u.NickName == payload.NickName);
 
             if (user is not null)
@@ -34,32 +40,26 @@ namespace TeaNotes.Auth.Controllers.Register
             var added = await _db.Users.AddAsync(new() { 
                 NickName = payload.NickName, 
                 PasswordHash = HashPassword(payload.Password),
+                Email = payload.Email,
+                IsEmailVerified = false,
             });
             await _db.SaveChangesAsync();
+
+            await SendEmailConfirmationAsync(added.Entity);
 
             return StatusCode(StatusCodes.Status201Created, added.Entity);
         }
 
         private static string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
 
-        private MimeMessage CreateConfirmationMessage(RegisterPayload payload)
+        private async Task SendEmailConfirmationAsync(User user)
         {
-            var bodyBuilder = new BodyBuilder
-            {
-                TextBody = $"Hello, {payload.NickName}! Please confirm the code! Your code: {Guid.NewGuid().ToString()}"
-            };
+            var code = _confirmationCodeGenerator.Generate(user);
 
-            var message = new MimeMessage
-            {
-                Body = bodyBuilder.ToMessageBody(),
-                Subject = "Confirm signing up",
-                Sender = _emailClient.Address,
-            };
+            await _db.RegisterConfirmationCodes.AddAsync(code);
+            await _db.SaveChangesAsync();
 
-            message.From.Add(_emailClient.Address);
-            message.To.Add(MailboxAddress.Parse(payload.Email));
-
-            return message;
+            await _emailClient.SendAsync(_registerEmailBuilder.Create(user, code));
         }
     }
 }

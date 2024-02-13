@@ -3,7 +3,7 @@ using MailKit.Net.Smtp;
 
 namespace TeaNotes.Email
 {
-    public class EmailClient
+    public class EmailClient : IAsyncDisposable
     {
         public MailboxAddress Address { get; private set; }
 
@@ -19,6 +19,13 @@ namespace TeaNotes.Email
         }
 
         public Task SendAsync(MimeMessage message) => _client.SendAsync(message);
+
+        public async ValueTask DisposeAsync()
+        {
+            await _client.DisconnectAsync(true);
+            _client.Dispose();
+            GC.SuppressFinalize(this);             
+        }
 
         private async Task InitAsync()
         {
