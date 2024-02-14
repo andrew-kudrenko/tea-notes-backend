@@ -32,25 +32,16 @@ namespace TeaNotes.Email
             $"{_configuration["Client:Url"]}/auth/confirm-email/${code}";
 
         private string CreateMessageBody(string code) => $@"
-            <h5>Добро пожаловать на TeaNotes!</h5>
-            <br>
-            <br>
+            <h1>Добро пожаловать на TeaNotes!</h1>
             <p>
                 Для завершения процесса регистрации, пожалуйста, 
                 перейдите по ссылке {CreateConfirmationLink(code)}.
             </p>
-            <br>
-            <br>
-            <p>Хорошего обучения!</p>
-
+            <p>Хорошего обучения!</p
             <p>
                 Если вы не зарегистрировали аккаунт на TeaNotes, 
                 пожалуйста, проигнорируйте это сообщение.
-            </p>
-            
-            <br>
-            <br>
-            
+            </p>            
             <p>
                 С любовью, <br>
                 Команда TeaNotes.

@@ -5,11 +5,16 @@ using Newtonsoft.Json;
 namespace TeaNotes.Users.Models
 {
     [Index(nameof(NickName), IsUnique = true)]
+    [Index(nameof(Email), IsUnique = true)]
     public class User
     {
         public int Id { get; set; }
-        [StringLength(30)]
+        [Required]
+        [StringLength(30, MinimumLength = 2)]
         public string NickName { get; set; } = string.Empty;
+        
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
         [JsonIgnore]

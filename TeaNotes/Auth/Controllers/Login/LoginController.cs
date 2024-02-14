@@ -34,6 +34,11 @@ namespace TeaNotes.Auth.Controllers.Login
                 return BadRequest("Password isn't correct");
             }
 
+            if (!user.IsEmailVerified)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "Адрес эл.почты не подтверждён");
+            }
+
             await _db.RefreshSessions.Where(s => s.UserId == user.Id).ExecuteDeleteAsync();
             await _db.SaveChangesAsync();
 
