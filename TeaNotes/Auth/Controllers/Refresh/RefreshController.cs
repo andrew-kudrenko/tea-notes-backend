@@ -33,6 +33,7 @@ namespace TeaNotes.Auth.Controllers.Refresh
             if (session is { })
             {
                 await _db.RefreshSessions.Where(s => s.Id == session.Id).ExecuteDeleteAsync();
+                await _db.SaveChangesAsync();
             } 
             else 
             {

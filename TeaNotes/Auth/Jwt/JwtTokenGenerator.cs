@@ -43,7 +43,7 @@ namespace TeaNotes.Auth.Jwt
             var token = new JwtSecurityToken(
                 issuer: _issuer,
                 audience: _audience,
-                claims: new Claim[] { new(ClaimTypes.Name, user.NickName) },
+                claims: new Claim[] { new(ClaimTypes.Name, user.Nickname) },
                 expires: expires,
                 signingCredentials: _signingCredentials
             );

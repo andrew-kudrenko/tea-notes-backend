@@ -2,7 +2,7 @@
 {
     public record LoginPayload
     {
-        public required string NickName { get; set; }
+        public required string Nickname { get; set; }
         public required string Password { get; set; }
     }
 }

@@ -7,10 +7,12 @@ namespace TeaNotes.Email
     {
         private readonly IConfiguration _configuration;
         private readonly BodyBuilder _bodyBuilder = new();
+        private readonly MailboxAddress _fromMailboxAddress;
 
         public RegisterEmailBuilder(IConfiguration configuration)
         {
             _configuration = configuration;
+            _fromMailboxAddress = MailboxAddress.Parse(_configuration["Email:Address"]!);
         }
 
         public MimeMessage Create(User user, ConfirmationCode code)
@@ -22,14 +24,14 @@ namespace TeaNotes.Email
                 Subject = $"[TeaNotes] Подтвердите e-mail адрес.",
                 Body = _bodyBuilder.ToMessageBody(),
             };
-            message.From.Add(MailboxAddress.Parse(_configuration["Email:Address"]!));
+            message.From.Add(_fromMailboxAddress);
             message.To.Add(MailboxAddress.Parse(user.Email));
 
             return message;
         }
 
         private string CreateConfirmationLink(string code) => 
-            $"{_configuration["Client:Url"]}/auth/confirm-email/${code}";
+            $"{_configuration["Client:Url"]}/auth/confirm-email/{code}";
 
         private string CreateMessageBody(string code) => $@"
             <h1>Добро пожаловать на TeaNotes!</h1>
@@ -37,14 +39,14 @@ namespace TeaNotes.Email
                 Для завершения процесса регистрации, пожалуйста, 
                 перейдите по ссылке {CreateConfirmationLink(code)}.
             </p>
-            <p>Хорошего обучения!</p
             <p>
                 Если вы не зарегистрировали аккаунт на TeaNotes, 
                 пожалуйста, проигнорируйте это сообщение.
-            </p>            
+            </p>           
+            <hr>
             <p>
                 С любовью, <br>
-                Команда TeaNotes.
+                Команда <b>TeaNotes</b>.
             </p>
         ";
     }

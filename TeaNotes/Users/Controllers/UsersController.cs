@@ -23,7 +23,7 @@ namespace TeaNotes.Users.Controllers
         {
             return User.Identity is null 
                 ? NotFound("Me is nothing") 
-                : Ok(await _db.Users.FirstOrDefaultAsync(u => u.NickName == User.Identity.Name));
+                : Ok(await _db.Users.FirstOrDefaultAsync(u => u.Nickname == User.Identity.Name));
         }
     }
 }

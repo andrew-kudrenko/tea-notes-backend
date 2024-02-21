@@ -22,7 +22,7 @@ namespace TeaNotes.Auth.Controllers.Login
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginPayload payload)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.NickName == payload.NickName);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Nickname == payload.Nickname);
 
             if (user is null)
             {
@@ -38,9 +38,6 @@ namespace TeaNotes.Auth.Controllers.Login
             {
                 return StatusCode(StatusCodes.Status403Forbidden, "Адрес эл.почты не подтверждён");
             }
-
-            await _db.RefreshSessions.Where(s => s.UserId == user.Id).ExecuteDeleteAsync();
-            await _db.SaveChangesAsync();
 
             return await CreateResponse(user);
         }
@@ -75,14 +72,17 @@ namespace TeaNotes.Auth.Controllers.Login
             });
             await _db.SaveChangesAsync();
 
-            Response.Cookies.Append(CookieKeys.RefreshToken, refresh.Token, new() { 
+            var secureCookieOptions = new CookieOptions()
+            {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None, 
+                SameSite = SameSiteMode.None,
                 Expires = refresh.ExpiresAt,
                 Domain = "localhost",
-            });
-            Response.Cookies.Append(CookieKeys.UserId, user.Id.ToString());
+            };
+
+            Response.Cookies.Append(CookieKeys.RefreshToken, refresh.Token, secureCookieOptions);
+            Response.Cookies.Append(CookieKeys.UserId, user.Id.ToString(), secureCookieOptions);
 
             return Ok(new LoginResponse()
             {
