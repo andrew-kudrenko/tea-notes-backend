@@ -25,7 +25,7 @@ namespace TeaNotes.Auth.Controllers.EmailConfirmation
 
             if (DateTime.Now > foundCode.ExpiresAt)
             {
-                return BadRequest("Code is outdated");
+                return BadRequest(Resources.ErrorMessages.OutdatedConfirmationCode);
             }
 
             foundCode.User.IsEmailVerified = true;

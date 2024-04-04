@@ -1,24 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TeaNotes.Common;
 
 namespace TeaNotes.Auth.Controllers.Register
 {
     public record RegisterPayload
     {
-        [StringLength(30, MinimumLength = 3, ErrorMessage = "Длина не менее 3 и не более 30 символов")]
-        [Required(ErrorMessage = "Обязательно к заполнению")]
+        [StringLength(30, MinimumLength = 3, ErrorMessage = ModelErrorMessages.StringLength)]
+        [Required(ErrorMessage = ModelErrorMessages.Required)]
         public required string Nickname { get; set; }
         
-        [EmailAddress]
-        [Required(ErrorMessage = "Обязательно к заполнению")]
+        [EmailAddress(ErrorMessage = ModelErrorMessages.Email)]
+        [Required(ErrorMessage = ModelErrorMessages.Required)]
         public required string Email { get; set; }
 
-        [Compare("PasswordRepeat", ErrorMessage = "Пароли не совпадают")]
-        [StringLength(30, MinimumLength = 8, ErrorMessage = "Длина не менее 8 и не более 30 символов")]
-        [Required]
+        [Compare(nameof(PasswordRepeat), ErrorMessage = ModelErrorMessages.PasswordsAreNotEqual)]
+        [StringLength(30, MinimumLength = 8, ErrorMessage = ModelErrorMessages.StringLength)]
+        [Required(ErrorMessage = ModelErrorMessages.Required)]
         public required string Password { get; set; }
 
-        [Compare("Password", ErrorMessage = "Пароли не совпадают")]
-        [Required]
+        [Compare(nameof(Password), ErrorMessage = ModelErrorMessages.PasswordsAreNotEqual)]
+        [Required(ErrorMessage = ModelErrorMessages.Required)]
         public required string PasswordRepeat { get; set; }
     }
 }

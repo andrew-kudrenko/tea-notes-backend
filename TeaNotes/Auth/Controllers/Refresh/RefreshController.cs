@@ -21,11 +21,11 @@ namespace TeaNotes.Auth.Controllers.Refresh
         [HttpPost]
         public async Task<ActionResult<RefreshResponse>> RefreshTokens()
         {
-            var requestRefreshToken = Request.Cookies[CookieKeys.RefreshToken];
+            var requestRefreshToken = Request.Cookies[AuthCookieKeys.RefreshToken];
 
             if (requestRefreshToken is null)
             {
-                return Unauthorized("Refresh token wasn't provided");
+                return Unauthorized(Resources.ErrorMessages.RefreshTokenNotFound);
             }
 
             var session = await _db.RefreshSessions.FirstOrDefaultAsync(s => s.RefreshToken == requestRefreshToken);
@@ -37,29 +37,27 @@ namespace TeaNotes.Auth.Controllers.Refresh
             } 
             else 
             {
-                return Unauthorized("Session not found");
+                return Unauthorized(Resources.ErrorMessages.RefreshSessionNotFound);
             }
 
             if (session.ExpiresAt <= DateTime.Now)
             {
-                return Unauthorized("Refresh token is expired");
+                return Unauthorized(Resources.ErrorMessages.OutdatedRefreshToken);
             }
 
             var refresh = _jwtTokenGenerator.GenerateRefreshToken();
-            Response.Cookies.Append(CookieKeys.RefreshToken, refresh.Token, new()
+            Response.Cookies.Append(AuthCookieKeys.RefreshToken, refresh.Token, new()
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None,
                 Expires = refresh.ExpiresAt,
-                Domain = "localhost",
             });
 
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == session.UserId);
 
             if (user is null)
             {
-                return Unauthorized("User is not found");
+                return Unauthorized(Resources.ErrorMessages.UserNotFound);
             }
 
             await _db.RefreshSessions.AddAsync(new()
@@ -73,10 +71,7 @@ namespace TeaNotes.Auth.Controllers.Refresh
 
             await _db.SaveChangesAsync();
 
-            return Ok(new RefreshResponse()
-            {
-                Tokens = new() { Access = access, Refresh = refresh }
-            });
+            return Ok(new RefreshResponse(access));
         }
     }
 }

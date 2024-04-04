@@ -26,17 +26,17 @@ namespace TeaNotes.Auth.Controllers.Login
 
             if (user is null)
             {
-                return NotFound("User is not found");
+                return NotFound(Resources.ErrorMessages.UserNotFound);
             }
 
             if (!IsPasswordCorrect(payload.Password, user.PasswordHash))
             {
-                return BadRequest("Password isn't correct");
+                return BadRequest(Resources.ErrorMessages.WrongPassword);
             }
 
             if (!user.IsEmailVerified)
             {
-                return StatusCode(StatusCodes.Status403Forbidden, "Адрес эл.почты не подтверждён");
+                return StatusCode(StatusCodes.Status403Forbidden, Resources.ErrorMessages.EmailNotConfirmed);
             }
 
             return await CreateResponse(user);
@@ -45,16 +45,16 @@ namespace TeaNotes.Auth.Controllers.Login
         [HttpPost("logout")]
         public async Task<ActionResult> Logout()
         {
-            if (Request.Cookies.ContainsKey(CookieKeys.UserId))
+            if (Request.Cookies.ContainsKey(AuthCookieKeys.UserId))
             {
-                var userId = int.Parse(Request.Cookies[CookieKeys.UserId]!);
+                var userId = int.Parse(Request.Cookies[AuthCookieKeys.UserId]!);
 
                 await _db.RefreshSessions.Where(s => s.UserId == userId).ExecuteDeleteAsync();
                 await _db.SaveChangesAsync();
             }
 
-            Response.Cookies.Delete(CookieKeys.RefreshToken);
-            Response.Cookies.Delete(CookieKeys.UserId);
+            Response.Cookies.Delete(AuthCookieKeys.RefreshToken);
+            Response.Cookies.Delete(AuthCookieKeys.UserId);
 
             return NoContent();
         }
@@ -76,22 +76,13 @@ namespace TeaNotes.Auth.Controllers.Login
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.None,
                 Expires = refresh.ExpiresAt,
-                Domain = "localhost",
             };
 
-            Response.Cookies.Append(CookieKeys.RefreshToken, refresh.Token, secureCookieOptions);
-            Response.Cookies.Append(CookieKeys.UserId, user.Id.ToString(), secureCookieOptions);
+            Response.Cookies.Append(AuthCookieKeys.RefreshToken, refresh.Token, secureCookieOptions);
+            Response.Cookies.Append(AuthCookieKeys.UserId, user.Id.ToString(), secureCookieOptions);
 
-            return Ok(new LoginResponse()
-            {
-                User = user,
-                Tokens = new() { 
-                    Access = _jwtTokenGenerator.GenerateAccessToken(user), 
-                    Refresh = refresh,
-                }
-            });
+            return Ok(new LoginResponse(user, _jwtTokenGenerator.GenerateAccessToken(user)));
         }
     }
 }

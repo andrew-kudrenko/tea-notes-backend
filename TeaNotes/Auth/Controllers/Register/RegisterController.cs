@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+using TeaNotes.Common;
 using TeaNotes.Database;
 using TeaNotes.Email;
 using TeaNotes.Users.Models;
@@ -31,7 +31,12 @@ namespace TeaNotes.Auth.Controllers.Register
         [HttpPost]
         public async Task<ActionResult<User>> Register([FromBody] RegisterPayload payload)
         {
-            var newUser = new User()
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { Errors = ModelUtils.ErrorMessagesToDict(ModelState) });
+            }
+
+            var candidate = new User()
             {
                 Nickname = payload.Nickname,
                 PasswordHash = HashPassword(payload.Password),
@@ -39,35 +44,23 @@ namespace TeaNotes.Auth.Controllers.Register
                 IsEmailVerified = false,
                 RegisteredAt = DateTime.Now,
             };
-            var validationContext = new ValidationContext(newUser);
-
-            if (!TryValidateModel(newUser))
+            
+            if (await _db.Users.AnyAsync(u => u.Email == candidate.Email))
             {
-                var errorList = ModelState
-                    .Where(f => f.Value!.Errors.Count > 0)
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ElementAt(0)
-                    );
-
-                return BadRequest(new { errors = errorList });
+                ModelState.AddModelError(nameof(candidate.Email), Resources.ErrorMessages.EmailAlreadyExist);
+            }
+            
+            if (await _db.Users.AnyAsync(u => u.Nickname == candidate.Nickname))
+            {
+                ModelState.AddModelError(nameof(candidate.Nickname), Resources.ErrorMessages.NicknameAlreadyExist);
             }
 
-            var user = await _db.Users.FirstOrDefaultAsync(u => u.Nickname == payload.Nickname || u.Email == payload.Email);
-
-            if (user is not null)
+            if (!ModelState.IsValid)
             {
-                return Conflict(new
-                {
-                    Errors = new Dictionary<string, string>()
-                    {
-                        { "email", user.Email == payload.Email ? "Пользователь с таким адресом эл.почтчы уже зарегистрирован" : "" },
-                        { "nickname", user.Nickname == payload.Nickname ? "Пользователь с таким ником уже зарегистрирован" : "" },
-                    },
-                });
+                return BadRequest(new { Errors = ModelUtils.ErrorMessagesToDict(ModelState) });
             }
 
-            var added = await _db.Users.AddAsync(newUser);
+            var added = await _db.Users.AddAsync(candidate);
             await _db.SaveChangesAsync();
 
             await SendEmailConfirmationAsync(added.Entity);

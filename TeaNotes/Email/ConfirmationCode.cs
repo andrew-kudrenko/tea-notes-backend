@@ -2,7 +2,7 @@
 
 namespace TeaNotes.Email
 {
-    public class ConfirmationCode
+    public record ConfirmationCode
     {
         public int Id { get; set; }
         public required string Email { get; set; }

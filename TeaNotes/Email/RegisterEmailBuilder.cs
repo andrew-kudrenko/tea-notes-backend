@@ -30,8 +30,7 @@ namespace TeaNotes.Email
             return message;
         }
 
-        private string CreateConfirmationLink(string code) => 
-            $"{_configuration["Client:Url"]}/auth/confirm-email/{code}";
+        private string CreateConfirmationLink(string code) => string.Join('/', _configuration["Client:Url"], "auth/confirm-email", code);
 
         private string CreateMessageBody(string code) => $@"
             <h1>Добро пожаловать на TeaNotes!</h1>

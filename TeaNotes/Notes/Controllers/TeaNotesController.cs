@@ -18,28 +18,26 @@ namespace TeaNotes.Notes.Controllers
         public TeaNotesController(AppDbContext db) => _db = db;
 
         [HttpGet]
-        public async Task<ActionResult> GetAll()
+        public ActionResult GetAll()
         {
-            var user = await GetUser();
-
-            if (user is null)
+            if (TryGetUserId(out var userId))
             {
-                return BadRequest("User is not defined");
+                return Ok(
+                    QueryNotes()
+                        .Where(n => n.User.Id == userId)
+                        .Select(TeaNoteDto.FromTeaNote)
+                        .ToList()
+                );
             }
 
-            return Ok(
-                QueryNotes()
-                    .Where(n => n.User.Id == user.Id)
-                    .Select(TeaNoteDto.FromTeaNote)
-                    .ToList()
-            );
+            return BadRequest(Resources.ErrorMessages.UserNotFound);
         }
 
         [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
         {
-            var note = await QueryNotes().FirstOrDefaultAsync(n => n.Id == id);
+            var note = await _db.TeaNotes.Include(n => n.Tastes).FirstOrDefaultAsync(n => n.Id == id);
 
             return note is not null ? Ok(TeaNoteDto.FromTeaNote(note)) : NotFound();
         }
@@ -47,13 +45,11 @@ namespace TeaNotes.Notes.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var user = await GetUser();
-
-            if (user is not null)
+            if (TryGetUserId(out var userId))
             {
                 var note = await _db.TeaNotes.FirstOrDefaultAsync(n => n.Id == id);
 
-                if (note is not null && note.User.Id == user.Id)
+                if (note is not null && note.User.Id == userId)
                 {
                     _db.TeaNotes.Remove(note);
                     await _db.SaveChangesAsync();
@@ -62,7 +58,7 @@ namespace TeaNotes.Notes.Controllers
                 }
             }
 
-            return BadRequest("User is not defined");
+            return BadRequest(Resources.ErrorMessages.UserNotFound);
         }
 
         [HttpPost]
@@ -73,18 +69,16 @@ namespace TeaNotes.Notes.Controllers
                 return BadRequest(source);
             }
 
-            var user = await GetUser();
-
-            if (user is null)
+            if (TryGetUserId(out var userId))
             {
-                return BadRequest("User is not defined");
+                var note = await CreateTeaNote(source, await GetUser());
+                var created = await _db.TeaNotes.AddAsync(note);
+                await _db.SaveChangesAsync();
+
+                return StatusCode(StatusCodes.Status201Created, await FindNoteById(created.Entity.Id));
             }
 
-            var note = await CreateTeaNote(source, user);
-            var created = await _db.TeaNotes.AddAsync(note);
-            await _db.SaveChangesAsync();
-
-            return StatusCode(StatusCodes.Status201Created, await FindNoteById(created.Entity.Id));
+            return BadRequest(Resources.ErrorMessages.UserNotFound);
         }
 
         [HttpPut("{id}")]
@@ -94,14 +88,14 @@ namespace TeaNotes.Notes.Controllers
 
             if (foundNote is null)
             {
-                return BadRequest($"Note is not found by id {id}");
+                return BadRequest(Resources.ErrorMessages.UserNotFound);
             }
 
             var user = await GetUser();
             
             if (user is null)
             {
-                return BadRequest("User is not defined");
+                return BadRequest(Resources.ErrorMessages.UserNotFound);
             }
             
             await AssignTeaNote(foundNote, source);
@@ -115,9 +109,11 @@ namespace TeaNotes.Notes.Controllers
             return StatusCode(StatusCodes.Status201Created, TeaNoteDto.FromTeaNote(foundNote));
         }
 
+        private bool TryGetUserId(out int userId) => int.TryParse(Request.Cookies[AuthCookieKeys.UserId]!, out userId);
+
         private async Task<User?> GetUser()
         {
-            return int.TryParse(Request.Cookies[CookieKeys.UserId], out var userId)
+            return int.TryParse(Request.Cookies[AuthCookieKeys.UserId], out var userId)
                 ? await _db.Users.FirstOrDefaultAsync(u => u.Id == userId)
                 : null;
         }

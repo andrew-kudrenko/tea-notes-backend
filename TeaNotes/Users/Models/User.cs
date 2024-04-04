@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using TeaNotes.Common;
 
 namespace TeaNotes.Users.Models
 {
@@ -9,12 +10,13 @@ namespace TeaNotes.Users.Models
     public class User
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "Обязательно к заполнению")]
-        [StringLength(30, MinimumLength = 3, ErrorMessage = "Длина не менее 3 и не более 30 символов")]
+
+        [StringLength(30, MinimumLength = 3, ErrorMessage = ModelErrorMessages.StringLength)]
+        [Required(ErrorMessage = ModelErrorMessages.Required)]
         public string Nickname { get; set; } = string.Empty;
         
-        [Required(ErrorMessage = "Обязательно к заполнению")]
-        [EmailAddress]
+        [EmailAddress(ErrorMessage = ModelErrorMessages.Email)]
+        [Required(ErrorMessage = ModelErrorMessages.Required)]
         public string Email { get; set; } = string.Empty;
 
         [JsonIgnore]

@@ -32,10 +32,7 @@ namespace TeaNotes.Auth.Jwt
             );
         }
 
-        public AuthToken GenerateRefreshToken()
-        {
-            return new() { ExpiresAt = DateTime.Now.AddDays(_refreshLifetime), Token = Guid.NewGuid().ToString() };
-        }
+        public AuthToken GenerateRefreshToken() => new(Guid.NewGuid().ToString(), DateTime.Now.AddDays(_refreshLifetime));
 
         public AuthToken GenerateAccessToken(User user)
         {
@@ -48,7 +45,7 @@ namespace TeaNotes.Auth.Jwt
                 signingCredentials: _signingCredentials
             );
 
-            return new() { ExpiresAt = expires, Token = _tokenHandler.WriteToken(token) };
+            return new(_tokenHandler.WriteToken(token), expires);
         }
     }
 }
